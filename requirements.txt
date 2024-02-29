@@ -1,0 +1,7 @@
+streamlit 
+pandas
+streamlit-option-menu
+mysql-connector-python
+python-dotenv
+setuptools
+-e .
