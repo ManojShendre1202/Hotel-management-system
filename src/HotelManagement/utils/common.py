@@ -6,7 +6,7 @@ from mysql.connector import (connection, cursor)
 import streamlit as st
 from dotenv import load_dotenv
 
-env_path = "C:\datascienceprojects\hotelmanagement\.env"
+env_path = "C:\datascienceprojects\hotel_management\.env"
 load_dotenv(env_path)
 
 
@@ -90,17 +90,24 @@ def valid_email(email):
 
 
 def fetch_admin(name):
-        connection = mysql.connector.connect(
-            host = os.getenv("host"),
-database = os.getenv("database"),
-user = os.getenv("user"),
-password = os.getenv("password"),
-auth_plugin=os.getenv("auth_plugin")
-        )
-        cursor = connection.cursor()
-        cursor.execute("SELECT name, email, password FROM admin WHERE name = %s", (name,))
-        admin_data = cursor.fetchone()
+    connection = mysql.connector.connect(
+        host=os.getenv("host"),
+        database=os.getenv("database"),
+        user=os.getenv("user"),
+        password=os.getenv("password"),
+        auth_plugin=os.getenv("auth_plugin")
+    )
+    cursor = connection.cursor()
+    cursor.execute("SELECT name, email, password FROM admin WHERE name = %s", (name,))
+    admin_data = cursor.fetchone()
+    if admin_data:
+        cursor.close()
+        connection.close()
         return admin_data
+    else:
+        cursor.close()
+        connection.close()
+        return None
 
 
 def insert_rooms(room_id, room_type, capacity, description, availability, per_night_price, amenities, room_status, notes):
@@ -206,24 +213,26 @@ def fetch_room_price(room_type, room_id):
             return None
         
 def fetch_booking_id(name, email):
-        connection = mysql.connector.connect(
-            host = os.getenv("host"),
-database = os.getenv("database"),
-user = os.getenv("user"),
-password = os.getenv("password"),
-auth_plugin=os.getenv("auth_plugin")
-        )
+    connection = mysql.connector.connect(
+        host=os.getenv("host"),
+        database=os.getenv("database"),
+        user=os.getenv("user"),
+        password=os.getenv("password"),
+        auth_plugin=os.getenv("auth_plugin")
+    )
 
-        cursor = connection.cursor()
-        cursor.execute("SELECT Booking_id FROM booking_details WHERE name = %s AND email = %s", (name, email))
-        booking_id = cursor.fetchone()
-        connection.commit()
-        cursor.close()
-        connection.close()
-        if booking_id:
-            return booking_id
-        else:
-            return None 
+    cursor = connection.cursor(buffered=False)  # Use unbuffered cursor
+
+    cursor.execute("SELECT Booking_id FROM booking_details WHERE name = %s AND email = %s", (name, email))
+    booking_id = cursor.fetchone()
+
+    cursor.close()  # Close the cursor
+    connection.close()  # Close the connection
+
+    if booking_id:
+        return booking_id
+    else:
+        return None
 
 def fetch_room_status(room_id):
     connection = mysql.connector.connect(

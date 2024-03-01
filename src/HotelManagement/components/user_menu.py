@@ -62,11 +62,9 @@ def room_booking():
                                 if availability == "Available" and room_status == "Clean" or "Available":
                                     if not check_room_id(room_id):
                                         base_price = fetch_room_price(room_type, room_id)
-                                        price = base_price * number_of_days
                                         insert_booking_details(name, email, phone_number, address, id_type, id_number, check_in, check_out, guests, room_type, room_id)
                                         update_room_availability(room_id, "Not available")
                                         booking_id = fetch_booking_id(name, email)
-                                        st.info(f"Total price = {price}")
                                         st.info(f"Book ID = {booking_id}")
                                         st.info("Booking is done successfully")
                                     else:
