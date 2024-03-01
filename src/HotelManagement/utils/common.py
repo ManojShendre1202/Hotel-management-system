@@ -6,8 +6,8 @@ from mysql.connector import (connection, cursor)
 import streamlit as st
 from dotenv import load_dotenv
 
-env_path = "C:\datascienceprojects\hotel_management\.env"
-load_dotenv(env_path)
+
+load_dotenv()
 
 
 def insert_user(username, email, password, phone_number):
