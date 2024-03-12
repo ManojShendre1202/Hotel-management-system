@@ -9,7 +9,6 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-
 def insert_user(username, email, password, phone_number):
     connection = mysql.connector.connect(
             host = os.getenv("host"),
@@ -213,26 +212,28 @@ def fetch_room_price(room_type, room_id):
             return None
         
 def fetch_booking_id(name, email):
-    connection = mysql.connector.connect(
-        host=os.getenv("host"),
-        database=os.getenv("database"),
-        user=os.getenv("user"),
-        password=os.getenv("password"),
-        auth_plugin=os.getenv("auth_plugin")
-    )
+    try:
+        connection = mysql.connector.connect(
+            host=os.getenv("host"),
+            database=os.getenv("database"),
+            user=os.getenv("user"),
+            password=os.getenv("password"),
+            auth_plugin=os.getenv("auth_plugin")
+        )
+        cursor = connection.cursor(buffered=False)  
+        cursor.execute("SELECT Booking_id FROM booking_details WHERE name = %s AND email = %s", (name, email))
+        booking_id = cursor.fetchone()
 
-    cursor = connection.cursor(buffered=False)  # Use unbuffered cursor
+    except mysql.connector.Error as err:
+        print(f"Error: {err}")
+        return None  # Return None on error 
+    finally:
+        if cursor:  # Check if cursor exists
+            cursor.close()
+        if connection:  # Check if connection exists
+            connection.close() 
 
-    cursor.execute("SELECT Booking_id FROM booking_details WHERE name = %s AND email = %s", (name, email))
-    booking_id = cursor.fetchone()
-
-    cursor.close()  # Close the cursor
-    connection.close()  # Close the connection
-
-    if booking_id:
-        return booking_id
-    else:
-        return None
+    return booking_id
 
 def fetch_room_status(room_id):
     connection = mysql.connector.connect(
